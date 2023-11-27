@@ -48,18 +48,18 @@ def obtener_canciones_mas_escuchadas(G:nx.classes.graph.Graph, usuario:str, cant
   elif len(canciones) <= cantidad:
     return canciones
   elif len(canciones) > cantidad:
-    while len(canciones) != cantidad:
+    while len(canciones) > cantidad:
       peso_min = 0
       cancion_min = ""
       tupla = None
       for cancion in canciones_peso:
-        if int(cancion[1]) > peso_min:
+        if int(cancion[1]) >= peso_min:
           peso_min = int(cancion[1])
           cancion_min = canciones[0]
           tupla = cancion
-      if tupla != None:
-        canciones_peso.remove(tupla)
-        canciones.remove(cancion_min)
+      
+      canciones_peso.remove(tupla)
+      canciones.remove(cancion_min)
     return canciones
 
 

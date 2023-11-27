@@ -152,135 +152,137 @@ bucle = True
 while bucle:
   if not registro:
     if eleccion == 'i' or eleccion == 'I':
-
-        ingreso = input ("Digite su nombre: ")
-        while ingreso not in usuarios_iniciales:
-          ingreso = input ("Su nombre no existe. Escribalo de nuevo. ")
-        # G.add_nodes_from(usuarios_iniciales, tripartite="usuarios")
+      ingreso = input ("Digite su nombre: ")
+      while ingreso not in usuarios_iniciales:
+        ingreso = input ("Su nombre no existe. Escribalo de nuevo. ")
+      # G.add_nodes_from(usuarios_iniciales, tripartite="usuarios")
+      registro = True
     elif eleccion == 'r' or eleccion == 'R':
-        ingreso = input("Ingrese su nombre: ")
-        if ingreso not in usuarios_iniciales:
-          usuarios_iniciales.append(ingreso)
-          G.add_nodes_from(usuarios_iniciales, tripartite="usuarios")
-          print ("A continuacion se mostrara una lista de artistas")
-          dic_art = {}
-          if len(artistas) >= 15:
-            for i in range(0, 15):
-              att = random.choice(artistas)
-              if att not in artt:
-                artt.append(att)
-                dic_art[i] = att
+      ingreso = input("Ingrese su nombre: ")
+      if ingreso not in usuarios_iniciales:
+        usuarios_iniciales.append(ingreso)
+        G.add_nodes_from(usuarios_iniciales, tripartite="usuarios")
+        print ("A continuacion se mostrara una lista de artistas")
+        dic_art = {}
+        if len(artistas) >= 15:
+          for i in range(0, 15):
+            att = random.choice(artistas)
+            if att not in artt:
+              artt.append(att)
+              dic_art[i] = att
+        else:
+          for i in range(0, len(artistas)):
+            if artistas[i] not in artt:
+              artt.append(artistas[i])
+              dic_art[i] = artistas[i]
+
+        print(dic_art)
+
+        eleccion = input ("Digite el número de el o los artistas que le gusta(si es mas de uno, separarlos por comas): ")
+        gustos = eleccion.split(",")
+        for i in gustos:
+          gustos1.append(dic_art[int(i)])
+
+        for i in gustos1:
+          if len(gustos1) == 1:
+            G.add_edge(ingreso, gustos1[0])
           else:
-            for i in range(0, len(artistas)):
-              if artistas[i] not in artt:
-                artt.append(artistas[i])
-                dic_art[i] = artistas[i]
+            G.add_edges_from([(ingreso, gustos1[i]) for i in range(0, len(gustos1))])
 
-          print(dic_art)
-
-          eleccion = input ("Digite el número de el o los artistas que le gusta(si es mas de uno, separarlos por comas): ")
-          gustos = eleccion.split(",")
-          for i in gustos:
-            gustos1.append(dic_art[int(i)])
-
-          for i in gustos1:
-            if len(gustos1) == 1:
-              G.add_edge(ingreso, gustos1[0])
-            else:
-              G.add_edges_from([(ingreso, gustos1[i]) for i in range(0, len(gustos1))])
-
-          while True:
-            if (noesta(artistas, gustos1)):
-              gustos.clear()
-              gustos1.clear()
-              eleccion = input ("Algun artista no exite o esta mal escrito. Por favor vuelva a digitar el o los nombres: ")
-              gustos = eleccion.split(",")
-              for i in gustos:
-                a = i.rstrip()
-                b = a.lstrip()
-                gustos1.append(b)
-              #print(gustos1)
-            else:
-              break
-
+        while True:
+          if (noesta(artistas, gustos1)):
+            gustos.clear()
+            gustos1.clear()
+            eleccion = input ("Algun artista no exite o esta mal escrito. Por favor vuelva a digitar el o los nombres: ")
+            gustos = eleccion.split(",")
+            for i in gustos:
+              a = i.rstrip()
+              b = a.lstrip()
+              gustos1.append(b)
+            #print(gustos1)
+          else:
+            break
+      registro = True        
     else:
         print("Ingrese una opcion valida.")
-  print(menu)
-  opcion = input("Dijite el número de la opción que quiere realizar: ")
-
   #########################################
-  if opcion == "1":
-    canciones_rc = {}
-    canciones_rr = []
-    print ("A continuacion se mostrara una lista de canciones de su(s) artista(s) favorito(s): ")
-    cont = 0
-    for i in obtener_artistas_usuario(G, ingreso):
-      for j in obtener_peso_canciones(G, i):
-        canciones_rr.append(j[0])
-        canciones_rc[cont] = j[0]
-        cont = cont + 1
+  else:
+    print(menu)
+    opcion = input("Dijite el número de la opción que quiere realizar: ")
 
-    print(canciones_rc)
 
-    eleccion_cn = int(input ("Digite el numero de la cancion que quiera escuchar: "))
+    if opcion == "1":
+      canciones_rc = {}
+      canciones_rr = []
+      print ("A continuacion se mostrara una lista de canciones de su(s) artista(s) favorito(s): ")
+      cont = 0
+      for i in obtener_artistas_usuario(G, ingreso):
+        for j in obtener_peso_canciones(G, i):
+          canciones_rr.append(j[0])
+          canciones_rc[cont] = j[0]
+          cont = cont + 1
 
-    while True:
-      if canciones_rc[eleccion_cn] not in canciones_rr:
-        eleccion_cn = int(input ("El numero no existe o esta mal escrito. Por favor vuelva a digitar el numero: "))
-      else:
-        break
+      print(canciones_rc)
 
-  #########################################
+      eleccion_cn = int(input ("Digite el numero de la cancion que quiera escuchar: "))
 
-    for i in aristas_art_can:
-      if G.has_edge(canciones_rc[eleccion_cn],i[1]):
-        peso_ant_art = G.edges[(canciones_rc[eleccion_cn], i[1])].get('peso')
-        art = i[1]
-    G.remove_edge(canciones_rc[eleccion_cn], art)
-    G.add_edge(ingreso, canciones_rc[eleccion_cn])
-    G.add_edge(canciones_rc[eleccion_cn], art)
-    peso_aristas[(ingreso, canciones_rc[eleccion_cn])] = 1
-    nx.set_edge_attributes(G, peso_aristas, name="peso")
-    pesos_art_can[(canciones_rc[eleccion_cn], art)] = peso_ant_art + 1
-    nx.set_edge_attributes(G, pesos_art_can, name="peso")
-    print("Reproduciendo... \n\n")
-    time.sleep(2)
-  #########################################
-  elif opcion == "2":
-    recomendaciones = recomendar_canciones(G, usuarios_iniciales[-1])
-    dic_recomendaciones = {}
-    for i, recomendacion in enumerate(recomendaciones):
-      dic_recomendaciones[i] = recomendacion
+      while True:
+        if canciones_rc[eleccion_cn] not in canciones_rr:
+          eleccion_cn = int(input ("El numero no existe o esta mal escrito. Por favor vuelva a digitar el numero: "))
+        else:
+          break
 
-    print(f"Estas son algunas de las canciones que le recomendamos: \n{dic_recomendaciones}")
-    opcion = input("Cuál canción desea escuchar?:\nDijite el número de canción\nQ. Si no decea escuchar alguna: ")
+    #########################################
 
-    if opcion == "q" or opcion == "Q":
-      pass
-    elif int(opcion) in dic_recomendaciones.keys():
       for i in aristas_art_can:
-        if G.has_edge(dic_recomendaciones[int(opcion)],i[1]):
-          peso_ant_art = G.edges[(dic_recomendaciones[int(opcion)], i[1])].get('peso')
+        if G.has_edge(canciones_rc[eleccion_cn],i[1]):
+          peso_ant_art = G.edges[(canciones_rc[eleccion_cn], i[1])].get('peso')
           art = i[1]
-      G.remove_edge(dic_recomendaciones[int(opcion)], art)
-      G.add_edge(ingreso, dic_recomendaciones[int(opcion)])
-      G.add_edge(dic_recomendaciones[int(opcion)], art)
-      peso_aristas[(ingreso, dic_recomendaciones[int(opcion)])] = 1
+      G.remove_edge(canciones_rc[eleccion_cn], art)
+      G.add_edge(ingreso, canciones_rc[eleccion_cn])
+      G.add_edge(canciones_rc[eleccion_cn], art)
+      peso_aristas[(ingreso, canciones_rc[eleccion_cn])] = 1
       nx.set_edge_attributes(G, peso_aristas, name="peso")
-      pesos_art_can[(dic_recomendaciones[int(opcion)], art)] = peso_ant_art + 1
+      pesos_art_can[(canciones_rc[eleccion_cn], art)] = peso_ant_art + 1
       nx.set_edge_attributes(G, pesos_art_can, name="peso")
       print("Reproduciendo... \n\n")
       time.sleep(2)
+    #########################################
+    elif opcion == "2":
+      recomendaciones = recomendar_canciones(G, usuarios_iniciales[-1])
+      dic_recomendaciones = {}
+      for i, recomendacion in enumerate(recomendaciones):
+        dic_recomendaciones[i] = recomendacion
 
-  #########################################
-  elif opcion == "3":
-    bucle = False
-  #########################################
-  else:
-    print("Por favor dijite una opción valida")
-    os.system('cls')    
-    time.sleep(1)
-  os.system('cls')
+      print(f"Estas son algunas de las canciones que le recomendamos: \n{dic_recomendaciones}")
+      opcion = input("Cuál canción desea escuchar?:\nDijite el número de canción\nQ. Si no decea escuchar alguna: ")
+
+      if opcion == "q" or opcion == "Q":
+        pass
+      elif int(opcion) in dic_recomendaciones.keys():
+        for i in aristas_art_can:
+          if G.has_edge(dic_recomendaciones[int(opcion)],i[1]):
+            peso_ant_art = G.edges[(dic_recomendaciones[int(opcion)], i[1])].get('peso')
+            art = i[1]
+        G.remove_edge(dic_recomendaciones[int(opcion)], art)
+        G.add_edge(ingreso, dic_recomendaciones[int(opcion)])
+        G.add_edge(dic_recomendaciones[int(opcion)], art)
+        peso_aristas[(ingreso, dic_recomendaciones[int(opcion)])] = 1
+        nx.set_edge_attributes(G, peso_aristas, name="peso")
+        pesos_art_can[(dic_recomendaciones[int(opcion)], art)] = peso_ant_art + 1
+        nx.set_edge_attributes(G, pesos_art_can, name="peso")
+        print("Reproduciendo... \n\n")
+        time.sleep(2)
+
+    #########################################
+    elif opcion == "3":
+      bucle = False
+    #########################################
+    else:
+      print("Por favor dijite una opción valida")
+      os.system('cls')    
+      time.sleep(1)
+    os.system('cls')
 
 # Graficar grafo
 #===========================================================================
